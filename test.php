@@ -4,15 +4,7 @@
 
 $DEBUGGING=False;
 
-$testurl="http://users.ics.aalto.fi/rkarhila/training_data_quality_test/test.php";
-
-$samplesperpage=5;
-$allowedtime=600;
-#$timertext="Time remaining:";
-
-$resultdir="/share/public_html/rkarhila/training_data_quality_test/results/";
-
-$personalorderfile="order.txt";
+include_once 'conf.php';
 
 # Handle first the preparations, then render page accordingly;
 
