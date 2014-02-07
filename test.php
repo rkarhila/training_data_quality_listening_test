@@ -2,7 +2,7 @@
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
 
-$DEBUGGING=False;
+$DEBUGGING=True;
 
 include_once 'conf.php';
 
@@ -15,15 +15,17 @@ $sentencelist;
 
 if ($listener) {
 
-    $listenerdir=cleanlistener($listener);
+    $listenerdir=cleanlistener($listener)."/";
 
 
-    if ( ! file_exists(  $resultdir . $listenerdir  ) ) {
-        mkdir($resultdir . $listenerdir);
-    }
+#    if ( ! file_exists(  $resultdir . $listenerdir  ) ) {
+        mkdir($resultdir . $listenerdir, 0777, true);
+#    }
 
 
     if ( isset( $_POST["submissiontag"] ) ) {
+
+	# If POST includes evaluation results, we'll write them to disk
 
 	foreach ($_POST as $key => $value) {
 	    if ($key[0] == 'e') {
@@ -37,31 +39,38 @@ if ($listener) {
 
     }
 
-
+    # The order of the samples is randomised for each listener,
+    # and the random order is saved in a file.
     
     $orderfile= $resultdir . $listenerdir . $personalorderfile;
 
+
     if ( ! file_exists(  $orderfile ) ) {
     
-    # if there is no order file for this listener, then we need to create it:
+        # if there is no order file for this listener, then we need to create it:
 
-    # Generate the list of sentences for the listener to evaluate;
-    # Do this by shuffling the sentence list with the checksum of the
-    # listener email/nickname:
+        # Generate the list of sentences for the listener to evaluate;
+        # Do this by shuffling the sentence list with the checksum of the
+        # listener email/nickname:
 
 	#$sentencelist=range(1001,1300,1);
+
 	$sentencelist=range(5980,6731,1);
 	$sentencelist=array_merge($sentencelist, range(6800,8000,1));
 	
-	srand(crc32($listener));
+	#srand(crc32($listener));
+	#
+	# In many php installations random functions are disabled for security
+	# reasons.
+	#
+	# SEOshuffle function provides shuffling functionality based on a seed
+	# 
 	SEOshuffle($sentencelist, crc32($listener));
 
 	$fh = fopen($orderfile, 'w');
-
 	foreach ($sentencelist as $n) {
 	    fwrite($fh, $n."\n");
 	}
-
 	fclose($fh);
     }
 
@@ -84,19 +93,15 @@ if ($listener) {
 
 
 
-
-
-#$sentencelist=array(  "5891", "5892", "5893", "5894", "5895" );
-#srand(crc32($listener));
-#SEOshuffle($sentencelist, crc32($listener));
-
-#$samples=$sentencelist;
-
-#$samples=array(  "5891", "5892", "5893", "5894", "5895" );
-
+    
 print getheader();
 
-print_r($_POST);
+
+if ($DEBUGGING) {
+    print "<pre>";
+    print_r($_POST);
+    print "</pre>";
+}
 
 // We'll check first if we have an email or not:
 
@@ -194,9 +199,9 @@ and need to improved, and categorise the most obvious problem in those sentences
     print "
 <p id=changeableText>
 
-<font color=#cc0000>You have rated 0 utterances (".($samplesperpage)." required) of which <br>
+<font color=#cc0000>You have rated 0 utterances (".($samplesperpage)." required)<!-- of which <br>
 0 utterances as adequate (1-".($samplesperpage-1)." required) and <br>
-0 utterances as requiring improvement (1-".($samplesperpage-1)." required).</font>
+0 utterances as requiring improvement (1-".($samplesperpage-1)." required).--></font>
 
 </p>";
 
@@ -246,7 +251,7 @@ if (val == $n.3 | val == $n.4 | val == $n.5 | val == $n.6)  { yes++; };
 
 // if (yes+no==$samplesperpage & yes > 0 & no>0 & clockOk() ) {
  if (yes+no==$samplesperpage) {
-  document.getElementById('changeableText').innerHTML=rated+yeses+nos+\"<br>\"+green+
+  document.getElementById('changeableText').innerHTML=rated+\"<br>\"+green+
      \"Please press submit to save your evaluations!\"+endgreen;
   activateSubmit();
   return true;
@@ -467,10 +472,13 @@ function SEOshuffle(&$items, $seed=false) {
 }
 
 
+/* File functions for bookkeeping */
+
+
 function checklock($resultdir, $sample,$timeout) {
     $lockdir=$resultdir."locks/".$sample[0].$sample[1]."/";
     if ( ! file_exists(  $lockdir  ) ) {
-        mkdir($lockdir);
+        mkdir($lockdir, 0777, true);
     }
     if ( ! file_exists(  $lockdir . $sample ) ) {
 	return true;
@@ -484,7 +492,7 @@ function checklock($resultdir, $sample,$timeout) {
 function checkresult($resultdir,$sample,$round) {
     $resdir=$resultdir."results_round".$round."/".$sample[0].$sample[1]."/";
     if ( ! file_exists(  $resdir ) ) {
-	mkdir($resdir);
+	mkdir($resdir, 0777, true);
     }
     if ( ! file_exists(  $resdir . $sample ) ) {
 	return true;
@@ -495,7 +503,7 @@ function checkresult($resultdir,$sample,$round) {
 function makelock($resultdir,$sample,$listener) {
     $lockdir=$resultdir."locks/".$sample[0].$sample[1]."/";
     if ( ! file_exists(  $lockdir  ) ) {
-        mkdir($lockdir);
+        mkdir($lockdir, 0777, true);
     }
     $fh = fopen(  $lockdir . $sample, 'w');
     fwrite($fh, "locked to ".$listener." on ".date('F d Y h:i A P T e', filemtime('test.php')));
@@ -504,28 +512,29 @@ function makelock($resultdir,$sample,$listener) {
 }
 
 function writeresult($resultdir,$sample,$rating,$listener) {
-    $listenerdir=cleanlistener($listener);
 
-    if ( ! file_exists(  $resultdir . $listenerdir  ) ) {
-        mkdir($resultdir . $listenerdir);
+    $cleanlistener=cleanlistener($listener);
+
+    if ( ! file_exists(  $resultdir . "listeners/". $cleanlistener  ) ) {
+        mkdir($resultdir."listeners/". $cleanlistener, 0777, true);
     }
 
-    $round=-1;
-    do {
-	$round++;
-	$resdir=$resultdir."results_round".$round."/".$sample[0].$sample[1]."/";
-    }
-    while ( file_exists( $resdir . $sample ));
-    $fh = fopen(  $resdir . $sample, 'w');
+    $resdir=$resultdir."results_all/".$sample[0].$sample[1]."/".$sample."/";
+    mkdir($resdir, 0777, true);
+
+    print "<pre>". $resdir . $cleanlistener ."</pre>";
+
+    $fh = fopen(  $resdir . $cleanlistener, 'w');
     fwrite($fh, "result: ". $rating."\nlistener: ". $listener."\ndate: ".date('F d Y h:i A P T e', filemtime('test.php')));
     fclose($fh);
 
-    $lisresdir=$listenerdir.$sample[0].$sample[1]."/";
+    $lisresdir="listeners/".$cleanlistener."/";
     if ( ! file_exists(  $lisresdir  ) ) {
-        mkdir($resultdir . $lisresdir);
+        mkdir($resultdir . $lisresdir, 0777, true);
     }
 
-    $fh = fopen(  $lisresdir . $sample, 'w');
+    $fh = fopen(  $resultdir . $lisresdir . $sample, 'w');
+    print "<pre>opened ". $lisresdir . $sample . " and writing</pre>";
     fwrite($fh, "result: ". $rating."\nlistener: ". $listener."\ndate: ".date('F d Y h:i A P T e', filemtime('test.php')));
     fclose($fh);
 
@@ -537,11 +546,11 @@ function writeresult($resultdir,$sample,$rating,$listener) {
 }
 
 function cleanlistener($listener) {
-    $listenerdir="".$listener;
-    $listenerdir=preg_replace( "[@]", "_at_", $listenerdir);
-    $listenerdir=preg_replace( "[\.]", "_", $listenerdir);
-    $listenerdir=preg_replace( "[^a-zA-Z0-9_]", "", $listenerdir)."/";
-
+    $cleanlistener="".$listener;
+    $cleanlistener=preg_replace( "[@]", "_at_", $cleanlistener);
+    $cleanlistener=preg_replace( "[\.]", "_", $cleanlistener);
+    $cleanlistener=preg_replace( "[^a-zA-Z0-9_]", "", $cleanlistener);
+    return $cleanlistener;
 }
 
 
