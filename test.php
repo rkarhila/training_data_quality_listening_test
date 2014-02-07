@@ -2,7 +2,8 @@
 //error_reporting(E_ALL);
 //ini_set("display_errors", 1);
 
-$DEBUGGING=True;
+$GLOBALS['DEBUGGING'] = False;
+
 
 include_once 'conf.php';
 
@@ -17,25 +18,15 @@ if ($listener) {
 
     $listenerdir=cleanlistener($listener)."/";
 
-
-#    if ( ! file_exists(  $resultdir . $listenerdir  ) ) {
+    if ( ! file_exists(  $resultdir . $listenerdir  ) ) {
         mkdir($resultdir . $listenerdir, 0777, true);
-#    }
-
+    }
 
     if ( isset( $_POST["submissiontag"] ) ) {
 
 	# If POST includes evaluation results, we'll write them to disk
 
-	foreach ($_POST as $key => $value) {
-	    if ($key[0] == 'e') {
-		$sample=$key[5].$key[6].$key[7].$key[8];
-		$rating=$value[5];
-
-		writeresult($resultdir,$sample,$rating,$listener );
-		#print "\n".$sample."-".$rating;
-	    }
-	}
+	writeresults($resultdir, $listener, $_POST);
 
     }
 
@@ -53,12 +44,9 @@ if ($listener) {
         # Do this by shuffling the sentence list with the checksum of the
         # listener email/nickname:
 
-	#$sentencelist=range(1001,1300,1);
+	$sentencelist=range(1001,1300,1);
 
-	$sentencelist=range(5980,6731,1);
-	$sentencelist=array_merge($sentencelist, range(6800,8000,1));
-	
-	#srand(crc32($listener));
+	# srand(crc32($listener));
 	#
 	# In many php installations random functions are disabled for security
 	# reasons.
@@ -69,43 +57,50 @@ if ($listener) {
 
 	$fh = fopen($orderfile, 'w');
 	foreach ($sentencelist as $n) {
-	    fwrite($fh, $n."\n");
+	    fwrite($fh, $filekey["$n"]."\n");
 	}
 	fclose($fh);
     }
 
     $fh = fopen($orderfile, 'r');
     $samples=array();
-    $nrrounds=0;
+    $alreadyevaluated=0;
 
     while( count($samples) < $samplesperpage ) {
 	$sample=trim(fgets($fh));
-	if (checkresult($resultdir, $sample, $nrrounds)) {
-	    if (checklock($resultdir, $sample,$allowedtime)) {
-		makelock($resultdir, $sample, $listener);
+	if ($sample) {
+	    if (checklistenerresults($resultdir, $listener, $sample )) {
+		if (checkresults($resultdir, $sample) + checklocks($resultdir, $sample,$listener,$allowedtime) < $min_evals)
+		    makelock($resultdir, $sample, $listener);
 		array_push($samples,trim($sample));
 	    }
-	}	
+	    else
+		$alreadyevaluated++;
+	}
+
+	else break;
     }
+
     fclose($fh);
 
 }
 
-
-
+if ($alreadyevaluated >= $requiredevaluations) {
+    print "Well done! That's all. Thank you.";
+}
+else
+{
     
 print getheader();
 
 
-if ($DEBUGGING) {
+if ($GLOBALS['DEBUGGING']) {
     print "<pre>";
     print_r($_POST);
     print "</pre>";
 }
 
 // We'll check first if we have an email or not:
-
-$listener=$_GET["listener"];
 
 if (!$listener) {
 
@@ -122,25 +117,18 @@ if (!$listener) {
 }
 else {
 
-    $listenerdir="".$listener;
-    $listenerdir=preg_replace( "[@]", "_at_", $listenerdir);
-    $listenerdir=preg_replace( "[\.]", "_", $listenerdir);
-    $listenerdir=preg_replace( "[^a-zA-Z0-9_]", "", $listenerdir);
+    $listenerdir=cleanlistener($listener);
 
     $testurl.="?listener=${listener}";
 
 
 
 
-#    print "<table width=450 border=2 align=center bgcolor=fedcff cellpadding=20><tr><td $testtdstyle>";
-
     print "<div class=divmain>";
-#    print "<p id=countdown>".$timertext." ".($allowedtime/60).":".($allowedtime%60)."</p>";
 
-
-    if ( 1 < 0 ) {
-	print "<p>You have already evaluated n sentences. Thank you for that</p>
-<p>Below you will find another $samplesperpage sentences synthesised using a low quality voice.
+    if ( $alreadyevaluated > 0 ) {
+	print "<p>You have already evaluated $alreadyevaluated out of $requiredevaluations sentences. Thank you for that</p>
+<p>Below you will find another set of sentences synthesised using a low quality voice.
 </p>";
     }
     else {
@@ -151,7 +139,7 @@ else {
     $intro = "<p>
 Please listen to them and mark which ones are unacceptably bad 
 and need to improved, and categorise the most obvious problem in those sentences.";
-#    print "You must mark 1-".($samplesperpage-1)." sentences for improvement.";
+
     print "</p>";
 
 
@@ -362,6 +350,7 @@ foreach ($samples as $n) {
 
 function playSample_$n() {
    audio_$n.play();
+   playbutton_$n.innerHTML=\" <font color=#00cc00><b>&#9658; play</b></font> \";
    playstamps_$n.push( (new Date().getTime() -loadstamp)/1000);
    disable_playbuttons()
 };";
@@ -379,7 +368,9 @@ function enable_playbuttons() {
 ";
 foreach ($samples as $n) {
     print "
-   playbutton_$n.disabled=false;";
+   playbutton_$n.disabled=false;
+   playbutton_$n.innerHTML=\"&#9658; play \";
+";
 }
 print "}
 
@@ -410,7 +401,7 @@ foreach ($samples as $n) {
     for (key in playstamps_$n) {
        var myin = document.createElement(\"input\");
        myin.type='hidden';
-       myin.name='sample_${n}_listenstamp_'+(key+1);
+       myin.name='sample_${n}_listenstamps_'+(key);
        myin.value=playstamps_${n}[key];
        document.ff1.appendChild(myin);
    }
@@ -418,7 +409,7 @@ foreach ($samples as $n) {
     for (key in answerstamps_$n) {
        var myin = document.createElement(\"input\");
        myin.type='hidden';
-       myin.name='sample_${n}_answerstamps_'+(key+1);
+       myin.name='sample_${n}_answerstamps_'+(key);
        myin.value=answerstamps_${n}[key];
        document.ff1.appendChild(myin);
    }
@@ -452,8 +443,8 @@ print "
 Last update to script: ".date('F d Y h:i A P T e', filemtime('test.php'));
 print "</p></div>";
 
-
-
+print "</body></hmtl>";
+}
 
 
 
@@ -475,42 +466,67 @@ function SEOshuffle(&$items, $seed=false) {
 /* File functions for bookkeeping */
 
 
-function checklock($resultdir, $sample,$timeout) {
-    $lockdir=$resultdir."locks/".$sample[0].$sample[1]."/";
+function checklocks($resultdir, $sample,$listener, $timeout) {
+    $lockdir=$resultdir."locks/".$sample[0].$sample[1]."/".$sample."/";
     if ( ! file_exists(  $lockdir  ) ) {
         mkdir($lockdir, 0777, true);
     }
-    if ( ! file_exists(  $lockdir . $sample ) ) {
-	return true;
+    $locks=array_diff(scandir($lockdir), array('..', '.'));
+    $lockcount=0;
+    foreach ($locks as $l) {
+	if ( filemtime(  $lockdir . $l ) <  time()-$timeout  ) {
+	    if ( $l != cleanlistener($listener)) {
+		$lockcount++;
+	    }
+	}
     }
-    elseif ( filemtime(  $lockdir . $sample ) <  time()-$timeout  ) {
-	return true;
-    }
-    else return false;
+    return $lockcount;
 }
 
-function checkresult($resultdir,$sample,$round) {
-    $resdir=$resultdir."results_round".$round."/".$sample[0].$sample[1]."/";
+function checkresults($resultdir,$sample) {
+    $resdir=$resultdir."results_all/".$sample[0].$sample[1]."/".$sample."/";
     if ( ! file_exists(  $resdir ) ) {
 	mkdir($resdir, 0777, true);
     }
-    if ( ! file_exists(  $resdir . $sample ) ) {
-	return true;
+
+    $answers=array_diff(scandir($resdir), array('..', '.'));
+
+    $answercount=0;
+    foreach ($answers as $a) {
+	    $answercount++;
+    }    
+    return $answercount;
+
+}
+
+function checklistenerresults($resultdir,$listener,$sample) {
+    
+    $cleanlistener=cleanlistener($listener);
+
+    $lisresdir="listeners/".$cleanlistener."/";
+
+    if ( ! file_exists(  $resultdir . $lisresdir  ) ) {
+	mkdir($resultdir . $lisresdir, 0777, true);
     }
-    else return false;
+    if ($GLOBALS['DEBUGGING'] ) {print  "<pre>checking \n".$resultdir . $lisresdir . $sample."</pre>";}
+    if (! file_exists(  $resultdir . $lisresdir . $sample ) ) {
+	return True;
+    }
+    else return False;
+
 }
 
 function makelock($resultdir,$sample,$listener) {
-    $lockdir=$resultdir."locks/".$sample[0].$sample[1]."/";
+    $lockdir=$resultdir."locks/".$sample[0].$sample[1]."/".$sample."/";
     if ( ! file_exists(  $lockdir  ) ) {
         mkdir($lockdir, 0777, true);
     }
-    $fh = fopen(  $lockdir . $sample, 'w');
+    $fh = fopen(  $lockdir . cleanlistener($listener), 'w');
     fwrite($fh, "locked to ".$listener." on ".date('F d Y h:i A P T e', filemtime('test.php')));
     fclose($fh);
     return true;
 }
-
+/*
 function writeresult($resultdir,$sample,$rating,$listener) {
 
     $cleanlistener=cleanlistener($listener);
@@ -544,6 +560,86 @@ function writeresult($resultdir,$sample,$rating,$listener) {
 	unlink($lockdir . $sample );
     }
 }
+*/
+
+function writeresults($resultdir,$listener, $data) {
+
+    $cleanlistener=cleanlistener($listener);
+    
+    if ( ! file_exists(  $resultdir . "listeners/". $cleanlistener  ) ) {
+        mkdir($resultdir."listeners/". $cleanlistener, 0777, true);
+    }
+
+    foreach ($data as $key => $value) {
+	if ($key[0] == 'e') {
+	    $sample=$key[5].$key[6].$key[7].$key[8];    
+	    
+	    $resdir=$resultdir."results_all/".$sample[0].$sample[1]."/".$sample."/";
+	    mkdir($resdir, 0777, true);
+	    
+	    if ($GLOBALS['DEBUGGING']) {
+		print "<pre>". $resdir . $cleanlistener ."</pre>";
+	    }
+	    
+	    $fh = fopen(  $resdir . $cleanlistener, 'w');
+	    fwrite($fh, "result: ". $data['eval_'.$sample][5]."\nlistener: ". $listener."\ndate: ".date('F d Y h:i A P T e', filemtime('test.php'))."\n");
+	    
+	    $ct=0;
+	    while (array_key_exists("sample_".$sample."_answerstamps_".$ct, $data) || array_key_exists("sample_".$sample."_listenstamps_".$ct, $data)) {
+		if (array_key_exists("sample_".$sample."_listenstamps_".$ct, $data) )
+		{
+		    fwrite($fh, "listenstamps_".$ct.": ".$data["sample_".$sample."_listenstamps_".$ct]."\n");
+		}	
+		
+		if (array_key_exists("sample_".$sample."_answerstamps_".$ct, $data) )
+		{
+		    fwrite($fh, "answerstamps_".$ct.": ".$data["sample_".$sample."_answerstamps_".$ct]."\n");
+		}
+		$ct++;
+	    }
+
+
+	    fclose($fh);
+
+	    $lisresdir="listeners/".$cleanlistener."/";
+	    if ( ! file_exists(  $lisresdir  ) ) {
+		mkdir($resultdir . $lisresdir, 0777, true);
+	    }
+	    
+	    $fh = fopen(  $resultdir . $lisresdir . $sample, 'w');
+	    if ($GLOBALS['DEBUGGING']) {
+		print "<pre>opened ". $resultdir . $lisresdir . $sample . " and writing</pre>";
+	    }
+	    fwrite($fh, "result: ". $rating."\nlistener: ". $listener."\ndate: ".date('F d Y h:i A P T e', filemtime('test.php')));
+	    $ct=0;
+	    while (array_key_exists("sample_".$sample."_answerstamps_".$ct, $data) || array_key_exists("sample_".$sample."_listenstamps_".$ct, $data)) {
+		if (array_key_exists("sample_".$sample."_listenstamps_".$ct, $data) )
+		{
+		    fwrite($fh, "listenstamps_".$ct.": ".$data["sample_".$sample."_listenstamps_".$ct]."\n");
+		}	
+		
+		if (array_key_exists("sample_".$sample."_answerstamps_".$ct, $data) )
+		{
+		    fwrite($fh, "answerstamps_".$ct.": ".$data["sample_".$sample."_answerstamps_".$ct]."\n");
+		}
+		$ct++;
+	    }
+	    fclose($fh);
+	    
+	    $lockdir=$resultdir."locks/".$sample[0].$sample[1]."/";
+	    
+	    if ( ! file_exists(  $lockdir . $sample  ) ) {
+		unlink($lockdir . $sample );
+	    }
+	}
+    }
+}
+    
+
+
+
+
+
 
 function cleanlistener($listener) {
     $cleanlistener="".$listener;
@@ -556,7 +652,7 @@ function cleanlistener($listener) {
 
 function getheader() {
 
-    $header="<HTML>
+    return "<HTML>
 <HEADER>
 <TITLE> Test on selecting sentences to training data pool  </TITLE>
 <STYLE TYPE=\"text/css\">
@@ -617,7 +713,7 @@ height:40px;
 
 ";
 
-    return $header;
+
 }
 
 ?>
