@@ -7,7 +7,6 @@ $DEBUGGING=False;
 include_once 'conf.php';
 
 # Handle first the preparations, then render page accordingly;
-
 # Has this listener evaluated something already?
 
 $listener=$_GET["listener"];
@@ -46,10 +45,11 @@ if ($listener) {
     
     # if there is no order file for this listener, then we need to create it:
 
-     # Generate the list of sentences for the listener to evaluate;
+    # Generate the list of sentences for the listener to evaluate;
     # Do this by shuffling the sentence list with the checksum of the
     # listener email/nickname:
 
+	#$sentencelist=range(1001,1300,1);
 	$sentencelist=range(5980,6731,1);
 	$sentencelist=array_merge($sentencelist, range(6800,8000,1));
 	
@@ -94,73 +94,9 @@ if ($listener) {
 
 #$samples=array(  "5891", "5892", "5893", "5894", "5895" );
 
+print getheader();
 
-$header="<HTML>
-<HEADER>
-<TITLE> Test on selecting sentences to training data pool  </TITLE>
-<STYLE TYPE=\"text/css\">
-   <!-- 
-body {  font-family: Arial, Helvetica, sans-serif; 
-        font-size: medium;
-}
-
-.spacer { 
-
-height:40px;
-}
-
-.divmain {    
-         left: 0; right: 0;
-         margin: 0 auto;
-         position: relative;
-         width:600px;
-         background:#dddddd; 
-         border:2px solid; 
-         border-radius:25px;
-         padding:20px;
-         z-index:2;
-}
-
-.divfooter {   
-    position: fixed;
-    background:#dddddd;
-    border-top: 1px solid #000;
-    font-size: small;
-    padding:0px;
-    right: 0px;
-    left: 0px;
-    bottom: 0px;
-    clear: both;
-    z-index:1;
-}
-
-
-.divfooterp {
-   padding: 5px 5px;
-   margin:0px;
-}
-
-
--->
-   </STYLE>
-</HEADER>
-<BODY>
-
-
-<img src=aalto-logo-en-2.gif align=right>
-<img src=s4a21-300x115.png height=80>
-<br><br>
-
-
-
-
-";
-
-print $header;
-
-
-
-
+print_r($_POST);
 
 // We'll check first if we have an email or not:
 
@@ -168,20 +104,15 @@ $listener=$_GET["listener"];
 
 if (!$listener) {
 
+    print "<div class=divmain> $introduction 
 
-print "<div class=divmain>
-   <p>The evaluated sentences are drawn randomly from a large pool of utterances. 
-   To keep track of which ones you've evaluated already, we need some kind of identifier,
-   with which you can return to this evaluation later.
-   <p>This can be a valid email address or some mumbo jumbo off your head, in case you're paranoid
-   that we might contact you (which just might happen in case you win in the prize draw if we have one...)
-   <p>
    <form method=get action=$testurl>
-Your email address or nickname:<br>
     <input type=text name=listener>
-    <input type=submit>    </form>
+    <input type=submit>    </form> 
+ </div>";
 
-</div>";
+    
+
 
 }
 else {
@@ -224,35 +155,41 @@ and need to improved, and categorise the most obvious problem in those sentences
 
 
 
-    print "<form name=\"ff1\" method=\"post\"  action=\"$testurl\" onsubmit=\"return validateForm();\">";
+    print "<form name=\"ff1\" method=\"post\"  action=\"$testurl\" onsubmit=\"beforeSubmit();\">";
 
     print "<table>";
-    print "<tr><th></th><th>Sample</th><th>Acceptable<br>quality</th></tr>";
+    print "<tr><th></th><th>Sample</th><th>Quality</th></tr>";
 
 
 
     $first=true;
     foreach ($samples as $n) {
-	$wavfile="bad_samples/roger_$n.wav";
+	$wavfile="audiosamples/roger_$n.wav";
 
-	print "<tr><td>$n</td><td><audio src=$wavfile controls width=100 onplay=\"document.ff1.eval_$n.disabled=false;\"></audio> </td>";
+	#print "<tr><td>$n</td><td><audio id=\"audio_$n\" src=$wavfile controls width=0 hidden onplay=\"document.ff1.eval_$n.disabled=false;\" ></audio>";
+	print "<tr><td>$n</td><td><audio id=\"audio_$n\" src=$wavfile onended=enable_playbuttons() ></audio>";
 
-	print "<td><select name=eval_$n size=1 onchange=\"validateForm();\">
+	print "<button  id=\"playbutton_$n\" onclick=\"playSample_$n()\"> &#9658; play </button> </td>";
+
+
+
+	print "<td><select name=eval_$n size=1 onchange=\"validateForm_$n();\">
 <option name=zero value=zero default> please select... </option>
-<option name=$n.2 value=$n.2 > Yes: Quality is good </option>
-<option name=$n.3 value=$n.3 > Yes: It's not great but it will do </option>
-<option name=$n.4 value=$n.4 > No: Mispronunciation of word(s) </option>
-<option name=$n.5 value=$n.5 > No: Incomprehensible segments </option>
-<option name=$n.6 value=$n.6 > No: Bad rhytmh or prosody </option>
-<option name=$n.7 value=$n.7 > No: Bad audio quality (artifacts etc) </option>
-</select></td></tr>";
+<option name=$n.2 value=$n.2 > Ok: Quality is good </option>
+<option name=$n.3 value=$n.3 > Ok: It's not great but it will do </option>
+<option name=$n.4 value=$n.4 > Not ok: Mispronunciation of word(s) </option>
+<option name=$n.5 value=$n.5 > Not ok: Incomprehensible segments </option>
+<option name=$n.6 value=$n.6 > Not ok: Bad rhytmh or prosody </option>
+<option name=$n.7 value=$n.7 > Not ok: Bad audio quality (artifacts etc) </option>
+</select></td>  
+</tr>";
     }
 
     print "</table>";
     print "<p align=center>";
     print "<input type=hidden name=submissiontag value=submitted>";
     print "<input type=hidden name=timePassed value=0>";
-    print "<input type=submit name=submitbutton disabled></form>";
+    print "<input type=submit onclick=\"beforeSubmit()\" name=submitbutton></form>";
 
     print "
 <p id=changeableText>
@@ -273,7 +210,6 @@ var green=\"<font color=#00cc00>\";
 var red=\"<font color=#cc0000>\";
 var endgreen=\"</font>\";
 var endred=\"</font>\";
-
 
 function validateForm() {
 //alert(\"Validate the number of corrections (1-4)\");
@@ -299,16 +235,17 @@ if (val == $n.3 | val == $n.4 | val == $n.5 | val == $n.6)  { yes++; };
     print "
 // alert(\"yes:\"+yes+\" no:\"+no);
 
-  rated=\"You have rated \"+(yes+no)+\" utterances ($samplesperpage required) of which <br>\";
+  rated=\"You have rated \"+(yes+no)+\" utterances ($samplesperpage required) \" //of which <br>\";
   yeses=yes+\" utterances as adequate (1-".($samplesperpage-1)." required) and <br>\";
   nos=no+\" utterances as requiring improvement (1-".($samplesperpage-1)." required).\";
 
   if (yes+no==$samplesperpage) {rated=green+rated+endgreen;} else {rated=red+rated+endred;}
-  if (yes>0 & yes < $samplesperpage) {yeses=green+yeses+endgreen;} else {yeses=red+yeses+endred;}
-  if (no>0 & no < $samplesperpage) {nos=green+nos+endgreen;} else {nos=red+nos+endred;}
+//  if (yes>0 & yes < $samplesperpage) {yeses=green+yeses+endgreen;} else {yeses=red+yeses+endred;}
+//  if (no>0 & no < $samplesperpage) {nos=green+nos+endgreen;} else {nos=red+nos+endred;}
 
 
- if (yes+no==$samplesperpage & yes > 0 & no>0 & clockOk() ) {
+// if (yes+no==$samplesperpage & yes > 0 & no>0 & clockOk() ) {
+ if (yes+no==$samplesperpage) {
   document.getElementById('changeableText').innerHTML=rated+yeses+nos+\"<br>\"+green+
      \"Please press submit to save your evaluations!\"+endgreen;
   activateSubmit();
@@ -316,7 +253,8 @@ if (val == $n.3 | val == $n.4 | val == $n.5 | val == $n.6)  { yes++; };
  } 
  else {
 
-  document.getElementById('changeableText').innerHTML=rated+yeses+nos+\"<br>\";
+//  document.getElementById('changeableText').innerHTML=rated+yeses+nos+\"<br>\";
+  document.getElementById('changeableText').innerHTML=rated+\"<br>\";
   deactivateSubmit();
   return false;
  }
@@ -393,7 +331,111 @@ print "
 
 ";
 
-	
+print "\n\n<script type=\"text/JavaScript\">";
+
+foreach ($samples as $n) {
+    print "
+function validateForm_$n() {
+   answerstamps_$n.push( ( new Date().getTime() -loadstamp )/1000);
+   validateForm();
+}
+";
+}
+
+
+
+
+print "</script>";
+
+
+
+print "\n\n<script type=\"text/JavaScript\">";
+foreach ($samples as $n) {
+
+    print"
+
+
+function playSample_$n() {
+   audio_$n.play();
+   playstamps_$n.push( (new Date().getTime() -loadstamp)/1000);
+   disable_playbuttons()
+};";
+}
+print "
+function disable_playbuttons() {
+";
+foreach ($samples as $n) {
+    print "
+   playbutton_$n.disabled=true;";
+}
+print "}
+
+function enable_playbuttons() {
+";
+foreach ($samples as $n) {
+    print "
+   playbutton_$n.disabled=false;";
+}
+print "}
+
+</script>";
+
+
+
+
+print "\n\n<script type=\"text/JavaScript\">
+";
+
+foreach ($samples as $n) {
+
+    print "
+loadstamp=new Date().getTime();
+playstamps_$n = new Array();
+answerstamps_$n = new Array();
+";
+}
+
+print "
+function beforeSubmit () {
+
+";
+
+foreach ($samples as $n) {
+    print "
+    for (key in playstamps_$n) {
+       var myin = document.createElement(\"input\");
+       myin.type='hidden';
+       myin.name='sample_${n}_listenstamp_'+(key+1);
+       myin.value=playstamps_${n}[key];
+       document.ff1.appendChild(myin);
+   }
+
+    for (key in answerstamps_$n) {
+       var myin = document.createElement(\"input\");
+       myin.type='hidden';
+       myin.name='sample_${n}_answerstamps_'+(key+1);
+       myin.value=answerstamps_${n}[key];
+       document.ff1.appendChild(myin);
+   }
+   var myin = document.createElement(\"input\");
+   myin.type='hidden';
+   myin.name='pageloadstamp';
+   myin.value=loadstamp;
+   document.ff1.appendChild(myin);
+
+";
+
+}
+print "
+
+    document.ff1.submit();
+    return false;
+}
+</script>
+";
+
+
+
 }
 
 
@@ -401,7 +443,7 @@ print "<div class=spacer> </div>";
 
 print "
 <div class=divfooter>
-<p class=divfooterp>Questions, comments etc to <i>reima &#9830; karhila <b>(attention)</b> aalto &#9830 fi</i><br>
+<p class=divfooterp>$footertext
 Last update to script: ".date('F d Y h:i A P T e', filemtime('test.php'));
 print "</p></div>";
 
@@ -500,6 +542,73 @@ function cleanlistener($listener) {
     $listenerdir=preg_replace( "[\.]", "_", $listenerdir);
     $listenerdir=preg_replace( "[^a-zA-Z0-9_]", "", $listenerdir)."/";
 
+}
+
+
+function getheader() {
+
+    $header="<HTML>
+<HEADER>
+<TITLE> Test on selecting sentences to training data pool  </TITLE>
+<STYLE TYPE=\"text/css\">
+   <!-- 
+body {  font-family: Arial, Helvetica, sans-serif; 
+        font-size: medium;
+}
+
+.spacer { 
+
+height:40px;
+}
+
+.divmain {    
+         left: 0; right: 0;
+         margin: 0 auto;
+         position: relative;
+         width:600px;
+         background:#dddddd; 
+         border:2px solid; 
+         border-radius:25px;
+         padding:20px;
+         z-index:2;
+}
+
+.divfooter {   
+    position: fixed;
+    background:#dddddd;
+    border-top: 1px solid #000;
+    font-size: small;
+    padding:0px;
+    right: 0px;
+    left: 0px;
+    bottom: 0px;
+    clear: both;
+    z-index:1;
+}
+
+
+.divfooterp {
+   padding: 5px 5px;
+   margin:0px;
+}
+
+
+-->
+   </STYLE>
+</HEADER>
+<BODY>
+
+
+<img src=aalto-logo-en-2.gif align=right>
+<img src=s4a21-300x115.png height=80>
+<br><br>
+
+
+
+
+";
+
+    return $header;
 }
 
 ?>
