@@ -1,0 +1,37 @@
+
+<?php
+
+
+# You will need a conf.php file that includes information about the location of
+# the script URL and the place where to write the result files inside the file system:
+
+
+# Include information about the URL where test is run, about samples etc...
+
+$testurl="http://example.foo/tester/training_data_quality_listening_test/test.php";
+$resultdir="/var/www/tester/training_data_quality_listening_test/results/";
+
+
+
+# Some variables to control the display of files to the listener:
+
+$samplesperpage=5;
+$allowedtime=600;
+#$timertext="Time remaining:";
+
+$footertext="Test run by n.n. In case of probelms or comments email: ootsae@renki.vai.pomo (For acute problems, call: 1234567890)";
+
+
+$personalorderfile="order.txt";
+
+
+# How many sentences to be evaluated?
+
+$numsent=300;
+
+# How many times each sentence needs to be evaluated?
+
+$min_evals=33;
+
+
+?>
