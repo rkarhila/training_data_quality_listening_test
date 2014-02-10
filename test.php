@@ -182,7 +182,7 @@ and need to improved, and categorise the most obvious problem in those sentences
     print "<p align=center>";
     print "<input type=hidden name=submissiontag value=submitted>";
     print "<input type=hidden name=timePassed value=0>";
-    print "<input type=submit onclick=\"beforeSubmit()\" name=submitbutton></form>";
+    print "<input type=submit name=submitbutton disabled></form>";
 
     print "
 <p id=changeableText>
@@ -424,6 +424,7 @@ foreach ($samples as $n) {
 }
 print "
 
+    alert(\"submitting\");
     document.ff1.submit();
     return false;
 }
