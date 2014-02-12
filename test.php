@@ -16,12 +16,23 @@ $sentencelist;
 if ($GLOBALS['DEBUGGING'] == True) {
     print "<pre>";
     print_r ($_POST);
+    print_r ($_GET);
     print "</pre>";
 }
 
 
 
 if ($listener) {
+
+    if ( isset( $_GET["gender"] ) ) {
+	$listenerstatfile=getstatfiledir($resultdir).$listener ."_stats";
+	$fh = fopen($listenerstatfile, 'w');
+	fwrite($fh,"listener: ".$_GET["listener"]."\n" );
+	fwrite($fh,"gender: ".$_GET["gender"]."\n" );
+	fwrite($fh,"agegroup: ".$_GET["agegroup"]."\n" );
+	fclose($fh);
+
+    }
 
     if ( isset( $_POST["submissiontag"] ) ) {
 
@@ -108,13 +119,47 @@ if (!$listener) {
     
     print "<div class=divmain> $introduction 
 
-   <form method=get action=$testurl>
-    <input type=text name=listener>
-    <input type=submit>    </form> 
- </div>";
-    
-    
+   <form name=\"ff0\" method=get action=$testurl>
+    <input id=listenername type=text name=listener oninput=\"checkForm()\"><br>
+    Gender:
+    <input id=r1 type=\"radio\" name=gender value=\"m\" onClick=\"checkForm()\">Female
+    <input id=r2 type=\"radio\" name=gender value=\"f\" onClick=\"checkForm()\">Male
+    <input id=r3 type=\"radio\" name=gender value=\"o\" onClick=\"checkForm()\">Other/unspecified
+    <br>
+    Age: 
+    <select id=ageselect name=agegroup  onchange=\"checkForm()\">
+    <option name=zero value=zero default> please select... </option>
+    <option name=under20 value=under20 default> Under 20 </option>
+    <option name=20to29 value=20to29 default> 20 to 29 </option>
+    <option name=30to39 value=30to39 default> 30 to 39 </option>
+    <option name=40to49 value=40to49 default> 40 to 49 </option>
+    <option name=50to59 value=50to59 default> 50 to 59 </option>
+    <option name=60to69 value=60to69 default> 60 to 69 </option>
+    <option name=over70 value=over70 default> 70 or over </option>
+    </select>
+    <br><br>
+    <input id=submitbutton0 type=submit disabled>    </form> 
+ </div>
 
+ <script type=\"text/JavaScript\">
+ function checkForm() {
+  if ( (r1.checked || r2.checked || r3.checked ) && (ageselect.value != \"zero\" )  && checklistener())
+  {
+   submitbutton0.disabled=false;
+  }
+   else
+  {
+   submitbutton0.disabled=true;
+  }
+ }
+
+ function checklistener() {
+   if (listenername.value.replace(/\W/g,'').length > 3) return true;
+   else return false;
+
+ }
+ </script> ";
+    
     
 }
 else {
@@ -183,7 +228,7 @@ and need to improved, and categorise the most obvious problem in those sentences
 <option name=$n.3 value=$n.3 disabled> Ok: It's not great but it will do </option>
 <option name=$n.4 value=$n.4  disabled> Not ok: Mispronunciation of word(s) </option>
 <option name=$n.5 value=$n.5  disabled> Not ok: Incomprehensible segments </option>
-<option name=$n.6 value=$n.6  disabled> Not ok: Bad rhytmh or prosody </option>
+<option name=$n.6 value=$n.6  disabled> Not ok: Bad rhytmh or intonation </option>
 <option name=$n.7 value=$n.7  disabled> Not ok: Bad audio quality (artifacts etc) </option>
 </select></td>  
 </tr>";
@@ -406,6 +451,14 @@ function getorderfiledir($resultdir) {
 	mkdir($orderdir, 0777, true);
     } 
     return $orderdir;
+}
+
+function getstatfiledir($resultdir) {
+    $statdir=$resultdir ."listenerstatfiles/";
+    if ( ! file_exists( $statdir ) ) {
+	mkdir($statdir, 0777, true);
+    } 
+    return $statdir;
 }
 
 
