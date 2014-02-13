@@ -1,0 +1,700 @@
+<HTML>
+<HEADER>
+<TITLE> Test on selecting sentences to training data pool  </TITLE>
+<STYLE TYPE="text/css">
+   <!-- 
+body {  font-family: Arial, Helvetica, sans-serif; 
+        font-size: medium;
+}
+
+.spacer { 
+
+height:40px;
+}
+
+.divmain {    
+         left: 0; right: 0;
+         margin: 0 auto;
+         position: relative;
+         width:600px;
+         background:#dddddd; 
+         border:2px solid; 
+         border-radius:25px;
+         padding:20px;
+         z-index:2;
+}
+
+.divfooter {   
+    position: fixed;
+    background:#dddddd;
+    border-top: 1px solid #000;
+    font-size: small;
+    padding:0px;
+    right: 0px;
+    left: 0px;
+    bottom: 0px;
+    clear: both;
+    z-index:1;
+}
+
+
+.divfooterp {
+   padding: 5px 5px;
+   margin:0px;
+}
+
+.divlistenerinfo {
+ border:1px solid; 
+ border-radius:5px;
+ padding:5px;
+}
+
+
+-->
+   </STYLE>
+</HEADER>
+<BODY>
+
+
+<img src=aalto-logo-en-2.gif align=right>
+<img src=s4a21-300x115.png height=80>
+<br><br>
+
+
+
+
+<div class=divmain><p>Below you will find 8 sentences synthesised using a low quality voice.<p></p><p>
+Please listen to them and mark which ones are unacceptably bad 
+and need to improved, and categorise the most obvious problem in those sentences.<form name="ff1"><table><tr><th></th><th>Sample</th><th>Quality</th></tr><tr><td>7075</td><td width=45><audio id="audio_7075" src=audiosamples/roger_7075.wav onended=enable_playbuttons() ></audio><button type=button id="playbutton_7075" onclick="playing_7075()"> &#9658; play </button> </td><td><select id=evalselect_7075 name=eval_7075 size=1 onchange="validateForm_7075();">
+<option name=zero value=zero default> please select... </option>
+<option name=7075.2 value=7075.2 disabled> Ok: Quality is good </option>
+<option name=7075.3 value=7075.3 disabled> Ok: It's not great but it will do </option>
+<option name=7075.4 value=7075.4  disabled> Not ok: Mispronunciation of word(s) </option>
+<option name=7075.5 value=7075.5  disabled> Not ok: Incomprehensible segments </option>
+<option name=7075.6 value=7075.6  disabled> Not ok: Bad rhytmh or intonation </option>
+<option name=7075.7 value=7075.7  disabled> Not ok: Bad audio quality (artifacts etc) </option>
+</select></td>  
+</tr><tr><td>6154</td><td width=45><audio id="audio_6154" src=audiosamples/roger_6154.wav onended=enable_playbuttons() ></audio><button type=button id="playbutton_6154" onclick="playing_6154()"> &#9658; play </button> </td><td><select id=evalselect_6154 name=eval_6154 size=1 onchange="validateForm_6154();">
+<option name=zero value=zero default> please select... </option>
+<option name=6154.2 value=6154.2 disabled> Ok: Quality is good </option>
+<option name=6154.3 value=6154.3 disabled> Ok: It's not great but it will do </option>
+<option name=6154.4 value=6154.4  disabled> Not ok: Mispronunciation of word(s) </option>
+<option name=6154.5 value=6154.5  disabled> Not ok: Incomprehensible segments </option>
+<option name=6154.6 value=6154.6  disabled> Not ok: Bad rhytmh or intonation </option>
+<option name=6154.7 value=6154.7  disabled> Not ok: Bad audio quality (artifacts etc) </option>
+</select></td>  
+</tr><tr><td>6167</td><td width=45><audio id="audio_6167" src=audiosamples/roger_6167.wav onended=enable_playbuttons() ></audio><button type=button id="playbutton_6167" onclick="playing_6167()"> &#9658; play </button> </td><td><select id=evalselect_6167 name=eval_6167 size=1 onchange="validateForm_6167();">
+<option name=zero value=zero default> please select... </option>
+<option name=6167.2 value=6167.2 disabled> Ok: Quality is good </option>
+<option name=6167.3 value=6167.3 disabled> Ok: It's not great but it will do </option>
+<option name=6167.4 value=6167.4  disabled> Not ok: Mispronunciation of word(s) </option>
+<option name=6167.5 value=6167.5  disabled> Not ok: Incomprehensible segments </option>
+<option name=6167.6 value=6167.6  disabled> Not ok: Bad rhytmh or intonation </option>
+<option name=6167.7 value=6167.7  disabled> Not ok: Bad audio quality (artifacts etc) </option>
+</select></td>  
+</tr><tr><td>6901</td><td width=45><audio id="audio_6901" src=audiosamples/roger_6901.wav onended=enable_playbuttons() ></audio><button type=button id="playbutton_6901" onclick="playing_6901()"> &#9658; play </button> </td><td><select id=evalselect_6901 name=eval_6901 size=1 onchange="validateForm_6901();">
+<option name=zero value=zero default> please select... </option>
+<option name=6901.2 value=6901.2 disabled> Ok: Quality is good </option>
+<option name=6901.3 value=6901.3 disabled> Ok: It's not great but it will do </option>
+<option name=6901.4 value=6901.4  disabled> Not ok: Mispronunciation of word(s) </option>
+<option name=6901.5 value=6901.5  disabled> Not ok: Incomprehensible segments </option>
+<option name=6901.6 value=6901.6  disabled> Not ok: Bad rhytmh or intonation </option>
+<option name=6901.7 value=6901.7  disabled> Not ok: Bad audio quality (artifacts etc) </option>
+</select></td>  
+</tr><tr><td>7079</td><td width=45><audio id="audio_7079" src=audiosamples/roger_7079.wav onended=enable_playbuttons() ></audio><button type=button id="playbutton_7079" onclick="playing_7079()"> &#9658; play </button> </td><td><select id=evalselect_7079 name=eval_7079 size=1 onchange="validateForm_7079();">
+<option name=zero value=zero default> please select... </option>
+<option name=7079.2 value=7079.2 disabled> Ok: Quality is good </option>
+<option name=7079.3 value=7079.3 disabled> Ok: It's not great but it will do </option>
+<option name=7079.4 value=7079.4  disabled> Not ok: Mispronunciation of word(s) </option>
+<option name=7079.5 value=7079.5  disabled> Not ok: Incomprehensible segments </option>
+<option name=7079.6 value=7079.6  disabled> Not ok: Bad rhytmh or intonation </option>
+<option name=7079.7 value=7079.7  disabled> Not ok: Bad audio quality (artifacts etc) </option>
+</select></td>  
+</tr><tr><td>7013</td><td width=45><audio id="audio_7013" src=audiosamples/roger_7013.wav onended=enable_playbuttons() ></audio><button type=button id="playbutton_7013" onclick="playing_7013()"> &#9658; play </button> </td><td><select id=evalselect_7013 name=eval_7013 size=1 onchange="validateForm_7013();">
+<option name=zero value=zero default> please select... </option>
+<option name=7013.2 value=7013.2 disabled> Ok: Quality is good </option>
+<option name=7013.3 value=7013.3 disabled> Ok: It's not great but it will do </option>
+<option name=7013.4 value=7013.4  disabled> Not ok: Mispronunciation of word(s) </option>
+<option name=7013.5 value=7013.5  disabled> Not ok: Incomprehensible segments </option>
+<option name=7013.6 value=7013.6  disabled> Not ok: Bad rhytmh or intonation </option>
+<option name=7013.7 value=7013.7  disabled> Not ok: Bad audio quality (artifacts etc) </option>
+</select></td>  
+</tr><tr><td>7554</td><td width=45><audio id="audio_7554" src=audiosamples/roger_7554.wav onended=enable_playbuttons() ></audio><button type=button id="playbutton_7554" onclick="playing_7554()"> &#9658; play </button> </td><td><select id=evalselect_7554 name=eval_7554 size=1 onchange="validateForm_7554();">
+<option name=zero value=zero default> please select... </option>
+<option name=7554.2 value=7554.2 disabled> Ok: Quality is good </option>
+<option name=7554.3 value=7554.3 disabled> Ok: It's not great but it will do </option>
+<option name=7554.4 value=7554.4  disabled> Not ok: Mispronunciation of word(s) </option>
+<option name=7554.5 value=7554.5  disabled> Not ok: Incomprehensible segments </option>
+<option name=7554.6 value=7554.6  disabled> Not ok: Bad rhytmh or intonation </option>
+<option name=7554.7 value=7554.7  disabled> Not ok: Bad audio quality (artifacts etc) </option>
+</select></td>  
+</tr><tr><td>7441</td><td width=45><audio id="audio_7441" src=audiosamples/roger_7441.wav onended=enable_playbuttons() ></audio><button type=button id="playbutton_7441" onclick="playing_7441()"> &#9658; play </button> </td><td><select id=evalselect_7441 name=eval_7441 size=1 onchange="validateForm_7441();">
+<option name=zero value=zero default> please select... </option>
+<option name=7441.2 value=7441.2 disabled> Ok: Quality is good </option>
+<option name=7441.3 value=7441.3 disabled> Ok: It's not great but it will do </option>
+<option name=7441.4 value=7441.4  disabled> Not ok: Mispronunciation of word(s) </option>
+<option name=7441.5 value=7441.5  disabled> Not ok: Incomprehensible segments </option>
+<option name=7441.6 value=7441.6  disabled> Not ok: Bad rhytmh or intonation </option>
+<option name=7441.7 value=7441.7  disabled> Not ok: Bad audio quality (artifacts etc) </option>
+</select></td>  
+</tr></table><p align=center><input type=hidden name=submissiontag value=submitted><input type=hidden name=timePassed value=0><input type=submit name=submitbutton disabled></form>
+<p id=changeableText>
+
+<font color=#cc0000>You have rated 0 utterances (8 required)<!-- of which <br>
+0 utterances as adequate (1-7 required) and <br>
+0 utterances as requiring improvement (1-7 required).--></font>
+
+</p>
+<p>You can have a break at any time. After your break, please return to the test via the 
+<a href=http://users.ics.aalto.fi/rkarhila/training_data_quality_listening_test/test.php>start page.</a></p>
+</div>
+
+<script type="text/JavaScript">
+
+var green="<font color=#00cc00>";
+var red="<font color=#cc0000>";
+var endgreen="</font>";
+var endred="</font>";
+
+function validateForm() {
+  var no=0;var yes=0;
+
+  if (document.ff1.eval_7075.value != "zero")   { yes++; };
+  if (document.ff1.eval_6154.value != "zero")   { yes++; };
+  if (document.ff1.eval_6167.value != "zero")   { yes++; };
+  if (document.ff1.eval_6901.value != "zero")   { yes++; };
+  if (document.ff1.eval_7079.value != "zero")   { yes++; };
+  if (document.ff1.eval_7013.value != "zero")   { yes++; };
+  if (document.ff1.eval_7554.value != "zero")   { yes++; };
+  if (document.ff1.eval_7441.value != "zero")   { yes++; };
+
+  rated="You have rated "+(yes)+" utterances (8 required) ";
+
+  if (yes==8) {rated=green+rated+endgreen;} else {rated=red+rated+endred;}
+
+  if (yes==8) {
+    document.getElementById('changeableText').innerHTML=rated+"<br>"+green+
+       "Please press submit to save your evaluations!"+endgreen;
+    activateSubmit();
+    return true;
+  } 
+  else {
+    document.getElementById('changeableText').innerHTML=rated+"<br>";
+    deactivateSubmit();
+    return false;
+  }
+}
+
+
+function activateSubmit() {
+  document.ff1.submitbutton.disabled=false;
+}
+
+function deactivateSubmit() {
+  document.ff1.submitbutton.disabled=true;
+}
+
+
+
+var timePassed=0;
+var myVar=setInterval(function(){myTimer()},1000);
+
+function myTimer()
+{
+ timePassed++;
+ document.ff1.timePassed.value=timePassed;
+}
+
+//////////// Sample 7075 handling /////////////////
+
+var playstamps_7075 = new Array();
+var answerstamps_7075 = new Array();
+
+function validateForm_7075() {
+   answerstamps_7075.push( ( new Date().getTime() -loadstamp )/1000);
+   validateForm();
+}
+
+function playing_7075() {
+   if (audio_7075.currentTime != 0) {
+    audio_7075.pause();
+    audio_7075.currentTime = 0;
+    enable_playbuttons() ;    
+   }
+   else {
+     audio_7075.play();
+     playstamps_7075.push( (new Date().getTime() -loadstamp)/1000);
+     disable_playbuttons()
+     playbutton_7075.innerHTML=" <font color=#00cc00><b>&#8718; stop</b></font> ";
+     playbutton_7075.disabled=false;
+     enable_selections_7075();
+  }
+}
+
+function enable_selections_7075() {
+   for(var i=0; i<evalselect_7075.length; i++) {
+     evalselect_7075.options[i].disabled = false;
+   }
+}
+
+
+//////////// Sample 6154 handling /////////////////
+
+var playstamps_6154 = new Array();
+var answerstamps_6154 = new Array();
+
+function validateForm_6154() {
+   answerstamps_6154.push( ( new Date().getTime() -loadstamp )/1000);
+   validateForm();
+}
+
+function playing_6154() {
+   if (audio_6154.currentTime != 0) {
+    audio_6154.pause();
+    audio_6154.currentTime = 0;
+    enable_playbuttons() ;    
+   }
+   else {
+     audio_6154.play();
+     playstamps_6154.push( (new Date().getTime() -loadstamp)/1000);
+     disable_playbuttons()
+     playbutton_6154.innerHTML=" <font color=#00cc00><b>&#8718; stop</b></font> ";
+     playbutton_6154.disabled=false;
+     enable_selections_6154();
+  }
+}
+
+function enable_selections_6154() {
+   for(var i=0; i<evalselect_6154.length; i++) {
+     evalselect_6154.options[i].disabled = false;
+   }
+}
+
+
+//////////// Sample 6167 handling /////////////////
+
+var playstamps_6167 = new Array();
+var answerstamps_6167 = new Array();
+
+function validateForm_6167() {
+   answerstamps_6167.push( ( new Date().getTime() -loadstamp )/1000);
+   validateForm();
+}
+
+function playing_6167() {
+   if (audio_6167.currentTime != 0) {
+    audio_6167.pause();
+    audio_6167.currentTime = 0;
+    enable_playbuttons() ;    
+   }
+   else {
+     audio_6167.play();
+     playstamps_6167.push( (new Date().getTime() -loadstamp)/1000);
+     disable_playbuttons()
+     playbutton_6167.innerHTML=" <font color=#00cc00><b>&#8718; stop</b></font> ";
+     playbutton_6167.disabled=false;
+     enable_selections_6167();
+  }
+}
+
+function enable_selections_6167() {
+   for(var i=0; i<evalselect_6167.length; i++) {
+     evalselect_6167.options[i].disabled = false;
+   }
+}
+
+
+//////////// Sample 6901 handling /////////////////
+
+var playstamps_6901 = new Array();
+var answerstamps_6901 = new Array();
+
+function validateForm_6901() {
+   answerstamps_6901.push( ( new Date().getTime() -loadstamp )/1000);
+   validateForm();
+}
+
+function playing_6901() {
+   if (audio_6901.currentTime != 0) {
+    audio_6901.pause();
+    audio_6901.currentTime = 0;
+    enable_playbuttons() ;    
+   }
+   else {
+     audio_6901.play();
+     playstamps_6901.push( (new Date().getTime() -loadstamp)/1000);
+     disable_playbuttons()
+     playbutton_6901.innerHTML=" <font color=#00cc00><b>&#8718; stop</b></font> ";
+     playbutton_6901.disabled=false;
+     enable_selections_6901();
+  }
+}
+
+function enable_selections_6901() {
+   for(var i=0; i<evalselect_6901.length; i++) {
+     evalselect_6901.options[i].disabled = false;
+   }
+}
+
+
+//////////// Sample 7079 handling /////////////////
+
+var playstamps_7079 = new Array();
+var answerstamps_7079 = new Array();
+
+function validateForm_7079() {
+   answerstamps_7079.push( ( new Date().getTime() -loadstamp )/1000);
+   validateForm();
+}
+
+function playing_7079() {
+   if (audio_7079.currentTime != 0) {
+    audio_7079.pause();
+    audio_7079.currentTime = 0;
+    enable_playbuttons() ;    
+   }
+   else {
+     audio_7079.play();
+     playstamps_7079.push( (new Date().getTime() -loadstamp)/1000);
+     disable_playbuttons()
+     playbutton_7079.innerHTML=" <font color=#00cc00><b>&#8718; stop</b></font> ";
+     playbutton_7079.disabled=false;
+     enable_selections_7079();
+  }
+}
+
+function enable_selections_7079() {
+   for(var i=0; i<evalselect_7079.length; i++) {
+     evalselect_7079.options[i].disabled = false;
+   }
+}
+
+
+//////////// Sample 7013 handling /////////////////
+
+var playstamps_7013 = new Array();
+var answerstamps_7013 = new Array();
+
+function validateForm_7013() {
+   answerstamps_7013.push( ( new Date().getTime() -loadstamp )/1000);
+   validateForm();
+}
+
+function playing_7013() {
+   if (audio_7013.currentTime != 0) {
+    audio_7013.pause();
+    audio_7013.currentTime = 0;
+    enable_playbuttons() ;    
+   }
+   else {
+     audio_7013.play();
+     playstamps_7013.push( (new Date().getTime() -loadstamp)/1000);
+     disable_playbuttons()
+     playbutton_7013.innerHTML=" <font color=#00cc00><b>&#8718; stop</b></font> ";
+     playbutton_7013.disabled=false;
+     enable_selections_7013();
+  }
+}
+
+function enable_selections_7013() {
+   for(var i=0; i<evalselect_7013.length; i++) {
+     evalselect_7013.options[i].disabled = false;
+   }
+}
+
+
+//////////// Sample 7554 handling /////////////////
+
+var playstamps_7554 = new Array();
+var answerstamps_7554 = new Array();
+
+function validateForm_7554() {
+   answerstamps_7554.push( ( new Date().getTime() -loadstamp )/1000);
+   validateForm();
+}
+
+function playing_7554() {
+   if (audio_7554.currentTime != 0) {
+    audio_7554.pause();
+    audio_7554.currentTime = 0;
+    enable_playbuttons() ;    
+   }
+   else {
+     audio_7554.play();
+     playstamps_7554.push( (new Date().getTime() -loadstamp)/1000);
+     disable_playbuttons()
+     playbutton_7554.innerHTML=" <font color=#00cc00><b>&#8718; stop</b></font> ";
+     playbutton_7554.disabled=false;
+     enable_selections_7554();
+  }
+}
+
+function enable_selections_7554() {
+   for(var i=0; i<evalselect_7554.length; i++) {
+     evalselect_7554.options[i].disabled = false;
+   }
+}
+
+
+//////////// Sample 7441 handling /////////////////
+
+var playstamps_7441 = new Array();
+var answerstamps_7441 = new Array();
+
+function validateForm_7441() {
+   answerstamps_7441.push( ( new Date().getTime() -loadstamp )/1000);
+   validateForm();
+}
+
+function playing_7441() {
+   if (audio_7441.currentTime != 0) {
+    audio_7441.pause();
+    audio_7441.currentTime = 0;
+    enable_playbuttons() ;    
+   }
+   else {
+     audio_7441.play();
+     playstamps_7441.push( (new Date().getTime() -loadstamp)/1000);
+     disable_playbuttons()
+     playbutton_7441.innerHTML=" <font color=#00cc00><b>&#8718; stop</b></font> ";
+     playbutton_7441.disabled=false;
+     enable_selections_7441();
+  }
+}
+
+function enable_selections_7441() {
+   for(var i=0; i<evalselect_7441.length; i++) {
+     evalselect_7441.options[i].disabled = false;
+   }
+}
+
+
+function disable_playbuttons() {
+
+   playbutton_7075.disabled=true;
+   playbutton_6154.disabled=true;
+   playbutton_6167.disabled=true;
+   playbutton_6901.disabled=true;
+   playbutton_7079.disabled=true;
+   playbutton_7013.disabled=true;
+   playbutton_7554.disabled=true;
+   playbutton_7441.disabled=true;}
+
+function enable_playbuttons() {
+
+   playbutton_7075.disabled=false;
+   playbutton_7075.innerHTML="&#9658; play ";
+
+   playbutton_6154.disabled=false;
+   playbutton_6154.innerHTML="&#9658; play ";
+
+   playbutton_6167.disabled=false;
+   playbutton_6167.innerHTML="&#9658; play ";
+
+   playbutton_6901.disabled=false;
+   playbutton_6901.innerHTML="&#9658; play ";
+
+   playbutton_7079.disabled=false;
+   playbutton_7079.innerHTML="&#9658; play ";
+
+   playbutton_7013.disabled=false;
+   playbutton_7013.innerHTML="&#9658; play ";
+
+   playbutton_7554.disabled=false;
+   playbutton_7554.innerHTML="&#9658; play ";
+
+   playbutton_7441.disabled=false;
+   playbutton_7441.innerHTML="&#9658; play ";
+} 
+
+loadstamp=new Date().getTime();
+
+function beforeSubmit () {
+
+
+    for (key in playstamps_7075) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_7075_listenstamps_'+(key);
+       myin.value=playstamps_7075[key];
+       document.ff1.appendChild(myin);
+   }
+
+    for (key in answerstamps_7075) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_7075_answerstamps_'+(key);
+       myin.value=answerstamps_7075[key];
+       document.ff1.appendChild(myin);
+   }
+   var myin = document.createElement("input");
+   myin.type='hidden';
+   myin.name='pageloadstamp';
+   myin.value=loadstamp;
+   document.ff1.appendChild(myin);
+
+
+    for (key in playstamps_6154) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_6154_listenstamps_'+(key);
+       myin.value=playstamps_6154[key];
+       document.ff1.appendChild(myin);
+   }
+
+    for (key in answerstamps_6154) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_6154_answerstamps_'+(key);
+       myin.value=answerstamps_6154[key];
+       document.ff1.appendChild(myin);
+   }
+   var myin = document.createElement("input");
+   myin.type='hidden';
+   myin.name='pageloadstamp';
+   myin.value=loadstamp;
+   document.ff1.appendChild(myin);
+
+
+    for (key in playstamps_6167) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_6167_listenstamps_'+(key);
+       myin.value=playstamps_6167[key];
+       document.ff1.appendChild(myin);
+   }
+
+    for (key in answerstamps_6167) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_6167_answerstamps_'+(key);
+       myin.value=answerstamps_6167[key];
+       document.ff1.appendChild(myin);
+   }
+   var myin = document.createElement("input");
+   myin.type='hidden';
+   myin.name='pageloadstamp';
+   myin.value=loadstamp;
+   document.ff1.appendChild(myin);
+
+
+    for (key in playstamps_6901) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_6901_listenstamps_'+(key);
+       myin.value=playstamps_6901[key];
+       document.ff1.appendChild(myin);
+   }
+
+    for (key in answerstamps_6901) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_6901_answerstamps_'+(key);
+       myin.value=answerstamps_6901[key];
+       document.ff1.appendChild(myin);
+   }
+   var myin = document.createElement("input");
+   myin.type='hidden';
+   myin.name='pageloadstamp';
+   myin.value=loadstamp;
+   document.ff1.appendChild(myin);
+
+
+    for (key in playstamps_7079) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_7079_listenstamps_'+(key);
+       myin.value=playstamps_7079[key];
+       document.ff1.appendChild(myin);
+   }
+
+    for (key in answerstamps_7079) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_7079_answerstamps_'+(key);
+       myin.value=answerstamps_7079[key];
+       document.ff1.appendChild(myin);
+   }
+   var myin = document.createElement("input");
+   myin.type='hidden';
+   myin.name='pageloadstamp';
+   myin.value=loadstamp;
+   document.ff1.appendChild(myin);
+
+
+    for (key in playstamps_7013) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_7013_listenstamps_'+(key);
+       myin.value=playstamps_7013[key];
+       document.ff1.appendChild(myin);
+   }
+
+    for (key in answerstamps_7013) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_7013_answerstamps_'+(key);
+       myin.value=answerstamps_7013[key];
+       document.ff1.appendChild(myin);
+   }
+   var myin = document.createElement("input");
+   myin.type='hidden';
+   myin.name='pageloadstamp';
+   myin.value=loadstamp;
+   document.ff1.appendChild(myin);
+
+
+    for (key in playstamps_7554) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_7554_listenstamps_'+(key);
+       myin.value=playstamps_7554[key];
+       document.ff1.appendChild(myin);
+   }
+
+    for (key in answerstamps_7554) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_7554_answerstamps_'+(key);
+       myin.value=answerstamps_7554[key];
+       document.ff1.appendChild(myin);
+   }
+   var myin = document.createElement("input");
+   myin.type='hidden';
+   myin.name='pageloadstamp';
+   myin.value=loadstamp;
+   document.ff1.appendChild(myin);
+
+
+    for (key in playstamps_7441) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_7441_listenstamps_'+(key);
+       myin.value=playstamps_7441[key];
+       document.ff1.appendChild(myin);
+   }
+
+    for (key in answerstamps_7441) {
+       var myin = document.createElement("input");
+       myin.type='hidden';
+       myin.name='sample_7441_answerstamps_'+(key);
+       myin.value=answerstamps_7441[key];
+       document.ff1.appendChild(myin);
+   }
+   var myin = document.createElement("input");
+   myin.type='hidden';
+   myin.name='pageloadstamp';
+   myin.value=loadstamp;
+   document.ff1.appendChild(myin);
+
+
+
+
+    document.ff1.submit();
+    return false;
+}
+</script>
+<div class=spacer> </div>
+<div class=divfooter>
+<p class=divfooterp>Questions, comments etc to <i>reima &#9830; karhila <b>(attention)</b> aalto &#9830 fi</i><br>
+Last update to script: February 13 2014 04:00 PM +02:00 EET Europe/Helsinki</p></div></body></hmtl>

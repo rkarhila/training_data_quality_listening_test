@@ -30,6 +30,7 @@ if ($listener) {
 	fwrite($fh,"listener: ".$_GET["listener"]."\n" );
 	fwrite($fh,"gender: ".$_GET["gender"]."\n" );
 	fwrite($fh,"agegroup: ".$_GET["agegroup"]."\n" );
+	fwrite($fh,"langgroup: ".$_GET["langgroup"]."\n" );
 	fclose($fh);
 
     }
@@ -118,15 +119,22 @@ if ($GLOBALS['DEBUGGING']) {
 if (!$listener) {
     
     print "<div class=divmain> $introduction 
-
+   <br><br>
+   <div class=divlistenerinfo >
+   <h3><a href=\"#\" onclick=\"returninglistener.hidden=true;newlistener.hidden=false;\">New listener</a></h3>
+   <div  id=newlistener hidden>
+   <p>
+    Your email address or nickname:<br>(Must contain at least 4 alphanumeric characters)<br>
+   
    <form name=\"ff0\" method=get action=$testurl>
-    <input id=listenername type=text name=listener oninput=\"checkForm()\"><br>
-    Gender:
+    <input id=listenername type=text name=listener oninput=\"checkForm()\">
+    <div id=listenerwarning></div><br>
+    Gender:<br>
     <input id=r1 type=\"radio\" name=gender value=\"m\" onClick=\"checkForm()\">Female
     <input id=r2 type=\"radio\" name=gender value=\"f\" onClick=\"checkForm()\">Male
     <input id=r3 type=\"radio\" name=gender value=\"o\" onClick=\"checkForm()\">Other/unspecified
-    <br>
-    Age: 
+    <br><br>
+    Age: <br>
     <select id=ageselect name=agegroup  onchange=\"checkForm()\">
     <option name=zero value=zero default> please select... </option>
     <option name=under20 value=under20 default> Under 20 </option>
@@ -138,12 +146,57 @@ if (!$listener) {
     <option name=over70 value=over70 default> 70 or over </option>
     </select>
     <br><br>
-    <input id=submitbutton0 type=submit disabled>    </form> 
+    English language background:<br> 
+    <select id=langselect name=langgroup  onchange=\"checkForm()\">
+    <option name=zero value=zero default> please select... </option>
+    <option name=scot value=scot default> Native speaker, Scottish English </option>
+    <option name=otherukorie value=otherukorie default> Native speaker, other UK or Irish dialects </option>
+    <option name=american value=american default> Native speaker, American English dialects </option>
+    <option name=southasian value=southasian default> Native speaker, South Asian English dialects </option>
+    <option name=australian value=australian default> Native speaker, Australian or NZ dialects </option>
+    <option name=other value=other default> Native speaker, other dialect </option>
+    <option name=nonnative value=nonnative default> Non-native speaker </option>
+    </select>
+    <br><br> 
+
+   <input id=submitbutton0 type=submit disabled>    </form> 
+   </div>
+   </div>
+   <br>
+   <div class=divlistenerinfo >
+   <h3><a href=\"#\" onclick=\"returninglistener.hidden=false;newlistener.hidden=true;\">Returning listener</a></h3>
+   <div  id=returninglistener hidden>
+<p>
+    Your email address or nickname:<br>
+
+    <form name=\"ff2\" method=get action=$testurl>
+       <input id=returninglistenername type=text name=listener oninput=\"checkForm()\"><br><br>
+       <input id=submitbutton1 type=submit disabled>    </form> 
+    </div>
+    </div>
+<p>$visitortext
  </div>
 
+
+
  <script type=\"text/JavaScript\">
+
+var xmlhttp;
+xmlhttp=new XMLHttpRequest();
+var listenersort;
+
  function checkForm() {
-  if ( (r1.checked || r2.checked || r3.checked ) && (ageselect.value != \"zero\" )  && checklistener())
+
+  listenerstatus=checklistener(listenername.value);
+
+   if (listenerstatus==\"old\") 
+   { 
+    listenerwarning.innerHTML=\"Nickname \"+listenername.value+\" taken\";
+   }
+   else listenerwarning.innerHTML=\"\";
+
+
+  if ( (r1.checked || r2.checked || r3.checked ) && (ageselect.value != \"zero\") && (langselect.value != \"zero\" )  && listenerstatus == \"new\")
   {
    submitbutton0.disabled=false;
   }
@@ -151,12 +204,27 @@ if (!$listener) {
   {
    submitbutton0.disabled=true;
   }
+  if (checklistener(returninglistenername.value) == \"old\") 
+  {
+   submitbutton1.disabled=false;
+  }
+   else
+  {
+   submitbutton1.disabled=true;
+  }
  }
 
- function checklistener() {
-   if (listenername.value.replace(/\W/g,'').length > 3) return true;
-   else return false;
+ function checklistener(lisname) {
 
+   name=lisname.replace(/\W/g,'');
+
+   if (name.length > 3) 
+   {
+    xmlhttp.open(\"GET\",\"${usercheckurl}?listener=\"+name ,false);
+    xmlhttp.send();
+    return xmlhttp.responseText;
+   }
+   else { return false; }
  }
  </script> ";
     
@@ -247,7 +315,9 @@ and need to improved, and categorise the most obvious problem in those sentences
 0 utterances as adequate (1-".($samplesonthispage-1)." required) and <br>
 0 utterances as requiring improvement (1-".($samplesonthispage-1)." required).--></font>
 
-</p>";
+</p>
+<p>$breaktext</p>
+";
 
 #    print "</td></tr></table>";
 	print "</div>";
@@ -530,7 +600,7 @@ function makelock($resultdir,$sample,$listener) {
 
     $lockdir=getlockdir($resultdir,$sample);
     $fh = fopen(  $lockdir . $listener, 'w');
-    fwrite($fh, "locked to ".$listener." on ".date('F d Y h:i A P T e', filemtime('test.php')));
+    fwrite($fh, "locked to ".$listener." on ".date('F d Y h:i A P T e')."\n");
     fclose($fh);
     return true;
 }
@@ -551,7 +621,7 @@ function writeresults($resultdir,$listener, $data) {
 	    
 	    /* Collect the important results and put them into a string */
 	    
-	    $resstring = "result: ". $data['eval_'.$sample][5]."\nlistener: ". $listener."\ndate: ".date('F d Y h:i A P T e', filemtime('test.php'))."\n";
+	    $resstring = "result: ". $data['eval_'.$sample][5]."\nlistener: ". $listener."\ndate: ".date('F d Y h:i A P T e')."\n";
 	    
 	    /* Get the timestamps from listening and rating events:  */
 
@@ -651,6 +721,12 @@ height:40px;
 .divfooterp {
    padding: 5px 5px;
    margin:0px;
+}
+
+.divlistenerinfo {
+ border:1px solid; 
+ border-radius:5px;
+ padding:5px;
 }
 
 
